@@ -1,0 +1,8 @@
+www.squarefoot.com.sg	FALSE	/	FALSE	1451049813	ja_nex_tpl	ja_nex
+.squarefoot.com.sg	TRUE	/	FALSE	1436889384	__utmz	81691669.1420377881.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none)
+.squarefoot.com.sg	TRUE	/	FALSE	1421121944	__utmt	1
+.squarefoot.com.sg	TRUE	/	FALSE	__utmc	81691669
+.squarefoot.com.sg	TRUE	/	FALSE	1421123184	__utmb	81691669.30.9.1421121384708
+.squarefoot.com.sg	TRUE	/	FALSE	1484193384	__utma	81691669.808955800.1420377881.1420377881.1421118252.2
+www.squarefoot.com.sg	FALSE	/	TRUE	4c58ce487e2c2608deb11d56b844b0c1	b6ae55a1434bd31e1119cb6687d84fed
+www.squarefoot.com.sg	FALSE	/	FALSE	1421121853	2675d5c97f434e4119fdc310a6e7333d	0
