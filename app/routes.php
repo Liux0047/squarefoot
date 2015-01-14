@@ -11,13 +11,8 @@
 |
 */
 
-Route::get('/', function()
-{
-	return View::make('hello');
-});
-
-
 Route::get('/', 'CrawlerController@getData');
+Route::get('/residential', 'ResidentialController@getData');
 
 
 
