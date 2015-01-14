@@ -18,18 +18,18 @@ class CrawlerController extends BaseController
     private $seriesInterval = 100;
 
     private $HDB = array(
-        'Ang Mo Kio',
-        'Bedok',
-        'Bishan',
-        'Bukit Batok',
-        'Bukit Merah',
-        'Bukit Panjang',
-        'Bukit Timah',
-        'Central Area',
-        'Choa Chu Kang',
-        'Clementi',
-        'Geylang',
-        'Hougang',
+//        'Ang Mo Kio',
+//        'Bedok',
+//        'Bishan',
+//        'Bukit Batok',
+//        'Bukit Merah',
+//        'Bukit Panjang',
+//        'Bukit Timah',
+//        'Central Area',
+//        'Choa Chu Kang',
+//        'Clementi',
+//        'Geylang',
+//        'Hougang',
         'Jurong East',
         'Jurong West',
         'Kallang%2FWhampoa',
@@ -60,78 +60,82 @@ class CrawlerController extends BaseController
     |
     */
 
-    public function getData($batch = 0)
+    public function getData()
     {
         //overrides the default PHP memory limit.
         ini_set('memory_limit', '-1');
         //increase execution limit
-        ini_set('max_execution_time', 300);
+        ini_set('max_execution_time', 3000);
         //set POST variables
         $url = 'https://www.squarefoot.com.sg/trends-and-analysis/hdb?a=';
         //cookie file
         $cookieFile = public_path() . DIRECTORY_SEPARATOR . 'cookies.txt';
 
-        $cUrls = array();
+        for ($HDBCount = 0; $HDBCount < count($this->HDB); $HDBCount++) {
+            $cUrls = array();
 
-        //create the multi handler
-        $multiHandler = curl_multi_init();
+            //create the multi handler
+            $multiHandler = curl_multi_init();
 
-        for ($series = $this->seriesStart; $series < $this->seriesEnd; $series += $this->seriesInterval) {
-            //open connection
-            $options = array(
-                CURLOPT_RETURNTRANSFER => true,     // return web page
-                CURLOPT_HEADER => false,    // don't return headers
-                CURLOPT_FOLLOWLOCATION => true,     // follow redirects
-                CURLOPT_ENCODING => "",       // handle all encodings
-                CURLOPT_USERAGENT => "spider", // who am i
-                CURLOPT_AUTOREFERER => true,     // set referer on redirect
-                CURLOPT_CONNECTTIMEOUT => 120,      // timeout on connect
-                CURLOPT_TIMEOUT => 120,      // timeout on response
-                CURLOPT_MAXREDIRS => 10,       // stop after 10 redirects
-                CURLOPT_SSL_VERIFYPEER => false,
-                //CURLOPT_COOKIEFILE => $cookieFile,
-                //CURLOPT_COOKIEJAR => $cookieFile,
-                CURLOPT_COOKIE => '4c58ce487e2c2608deb11d56b844b0c1=ceb79222f5bd7ef7a9836ab749a16c88; path=/; domain=www.squarefoot.com.sg; Secure',
-                CURLOPT_POST => 1,
-                //CURLOPT_POSTFIELDS => 'txtbox=' . $postalCode,
-            );
+            for ($series = $this->seriesStart; $series < $this->seriesEnd; $series += $this->seriesInterval) {
+                //open connection
+                $options = array(
+                    CURLOPT_RETURNTRANSFER => true,     // return web page
+                    CURLOPT_HEADER => false,    // don't return headers
+                    CURLOPT_FOLLOWLOCATION => true,     // follow redirects
+                    CURLOPT_ENCODING => "",       // handle all encodings
+                    CURLOPT_USERAGENT => "spider", // who am i
+                    CURLOPT_AUTOREFERER => true,     // set referer on redirect
+                    CURLOPT_CONNECTTIMEOUT => 120,      // timeout on connect
+                    CURLOPT_TIMEOUT => 120,      // timeout on response
+                    CURLOPT_MAXREDIRS => 10,       // stop after 10 redirects
+                    CURLOPT_SSL_VERIFYPEER => false,
+                    //CURLOPT_COOKIEFILE => $cookieFile,
+                    //CURLOPT_COOKIEJAR => $cookieFile,
+                    CURLOPT_COOKIE => '4c58ce487e2c2608deb11d56b844b0c1=ceb79222f5bd7ef7a9836ab749a16c88; path=/; domain=www.squarefoot.com.sg; Secure',
+                    CURLOPT_POST => 1,
+                    //CURLOPT_POSTFIELDS => 'txtbox=' . $postalCode,
+                );
 
-            $requestUrl = $url . $series . "-" . ($series + $this->seriesInterval) . "+" . $this->HDBParam($this->HDB[$batch]);
+                $requestUrl = $url . $series . "-" . ($series + $this->seriesInterval) . "+" . $this->HDBParam($this->HDB[$HDBCount]);
 
-            $ch = curl_init($requestUrl);
-            curl_setopt_array($ch, $options);
-            curl_multi_add_handle($multiHandler, $ch);
+                $ch = curl_init($requestUrl);
+                curl_setopt_array($ch, $options);
+                curl_multi_add_handle($multiHandler, $ch);
 
 
-            $cUrlRecord['curl'] = $ch;
-            $cUrlRecord['series'] = $series;
-            $cUrls[] = $cUrlRecord;
-        }
-
-        $running = null;
-        //execute the handles
-        do {
-            $status = curl_multi_exec($multiHandler, $running);
-            // Check for errors
-            if ($status > 0) {
-                // Display error message
-                echo "ERROR!\n " . curl_multi_strerror($status);
+                $cUrlRecord['curl'] = $ch;
+                $cUrlRecord['series'] = $series;
+                $cUrlRecord['HDBName'] = $this->HDB[$HDBCount];
+                $cUrls[] = $cUrlRecord;
             }
-        } while ($status === CURLM_CALL_MULTI_PERFORM || $running);
 
-        $records = array();
-        foreach ($cUrls as $ch) {
-            echo $this->extractData(curl_multi_getcontent($ch['curl']));
-            //$records[] = $this->extractData(curl_multi_getcontent($ch['curl']), $ch['series']);
-            curl_multi_remove_handle($multiHandler, $ch['curl']);
+            $running = null;
+            //execute the handles
+            do {
+                $status = curl_multi_exec($multiHandler, $running);
+                // Check for errors
+                if ($status > 0) {
+                    // Display error message
+                    echo "ERROR!\n " . curl_multi_strerror($status);
+                }
+            } while ($status === CURLM_CALL_MULTI_PERFORM || $running);
+
+            foreach ($cUrls as $ch) {
+                echo $this->extractData(curl_multi_getcontent($ch['curl']), $ch['series'], $cUrlRecord['HDBName']);
+                //$records[] = $this->extractData(curl_multi_getcontent($ch['curl']), $ch['series']);
+                curl_multi_remove_handle($multiHandler, $ch['curl']);
+            }
+
+            curl_multi_close($multiHandler);
+
         }
 
-        curl_multi_close($multiHandler);
 
     }
 
 
-    private function extractData($html)
+    private function extractData($html, $series, $HDBName)
     {
 
         //find the <div> tag of Past Transactions
@@ -145,8 +149,8 @@ class CrawlerController extends BaseController
         if ($pastTransactionStart) {
             $pastTransactionDiv = substr($html, $pastTransactionStart, $pastTransactionEnd - $pastTransactionStart);
 
-            echo "<h3>PAST TRANSACTIONS</h3><hr>";
-            $this->extractDiv($pastTransactionDiv, PAST_TRANSACTION);
+            echo "<h3>" . $HDBName . " - " . $series . ": PAST TRANSACTIONS</h3><hr>";
+            $this->extractDiv($pastTransactionDiv, CrawlerController::PAST_TRANSACTION);
 
         }
 
@@ -161,9 +165,11 @@ class CrawlerController extends BaseController
 
         if ($rentalContractStart) {
             $rentalContractDiv = substr($html, $rentalContractStart, $rentalContractEnd - $rentalContractStart);
+
+            echo "<h3>" . $HDBName . " - " . $series . ": RENTAL CONTRACTS</h3><hr>";
+            $this->extractDiv($rentalContractDiv, CrawlerController::RENTAL_CONTRACT);
         }
-        echo "<h3>RENTAL CONTRACTS</h3><hr>";
-        $this->extractDiv($rentalContractDiv, RENTAL_CONTRACT);
+
 
     }
 
@@ -205,8 +211,9 @@ class CrawlerController extends BaseController
         //discard first <tr> which is the header
         for ($i = 1; $i < $items->length; $i++) {
             $this->recordData($items->item($i)->childNodes, $roomCount, $type);
-
         }
+
+        echo $roomCount . ": " . ($items->length - 1) . " entries <br>";
     }
 
 
@@ -214,8 +221,8 @@ class CrawlerController extends BaseController
     {
         $data = array();
         foreach ($nodes as $node) {
-            $nodeValue = trim($node->nodeValue);
-            if (!empty($nodeValue)) {
+            $nodeValue = $node->nodeValue;
+            if (strlen(trim($nodeValue))) {
                 $data[] = $nodeValue;
             }
         }
@@ -247,7 +254,6 @@ class CrawlerController extends BaseController
                 $rental->save();
             }
 
-            echo $roomCount . ": " . $data[0] . "-" . $data[1] . "<br>";
 
         }
 

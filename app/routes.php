@@ -17,7 +17,7 @@ Route::get('/', function()
 });
 
 
-Route::get('/{batch}', 'CrawlerController@getData');
+Route::get('/', 'CrawlerController@getData');
 
 
 
