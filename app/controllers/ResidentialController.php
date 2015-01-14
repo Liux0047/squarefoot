@@ -55,8 +55,8 @@ class ResidentialController extends BaseController
         //cookie file
         $cookieFile = public_path() . DIRECTORY_SEPARATOR . 'cookies.txt';
 
-        //$condoNames = CondoName::all();
-        $condoNames = CondoName::where('condo_name', '=', 'The Lakeshore')->get();
+        $condoNames = CondoName::where('condo_name_id', '>', '1012')->get();
+        //$condoNames = CondoName::where('condo_name', '=', 'The Lakeshore')->get();
 
         foreach ($condoNames as $condoName) {
             //open connection
@@ -89,8 +89,8 @@ class ResidentialController extends BaseController
             $html = curl_exec($ch);
             curl_close($ch);
 
-            echo $html;
-            //$this->extractData($html, $condoName);
+            //echo $html;
+            $this->extractData($html, $condoName);
         }
 
 
@@ -161,20 +161,14 @@ class ResidentialController extends BaseController
 
         //initialize data array
         $data = array();
-        foreach ($this->infoFields as $field){
+        foreach ($this->infoFields as $field) {
             $data[$field] = '';
         }
 
         //record all tr entries
         for ($i = 0; $i < $items->length - 1; $i++) {
             $nodes = $items->item($i)->childNodes;
-            foreach ($nodes as $node) {
-                if (strlen(trim($node->nodeValue))) {
-                    $nodeValue = $node->nodeValue;
-                }
-            }
-
-            $data[] = $nodeValue;
+            $data[$nodes->item(0)->nodeValue] = $nodes->item(2)->nodeValue;
         }
 
         $info = new ProjectInfo;
@@ -205,6 +199,8 @@ class ResidentialController extends BaseController
 
     private function extractTable($table, $condoNameId, $type)
     {
+        libxml_use_internal_errors(true);
+        $table = str_replace("&", "&amp;", $table);
         $DOM = new DOMDocument;
         $DOM->loadHTML($table);
 
