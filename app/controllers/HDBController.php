@@ -13,7 +13,7 @@ class HDBController extends BaseController
     const RENTAL_CONTRACT = 2;
 
 
-    private $interval = 100;
+    private $interval = 20;
 
 
     /*
@@ -98,6 +98,15 @@ class HDBController extends BaseController
 
         curl_multi_close($multiHandler);
 
+
+        if ($batch < (7243 / $this->interval + 1)) {
+            $param['nextBatch'] = $batch + 1;
+            $param['hasNext'] = true;
+        } else {
+            $param['hasNext'] = false;
+        }
+
+        return View::make('result', $param);
     }
 
 
