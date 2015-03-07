@@ -98,10 +98,6 @@ class HDBController extends BaseController
 
         curl_multi_close($multiHandler);
 
-
-        if ($batch < 73) {
-            return Redirect::action('HDBController@getData', array($batch + 1));
-        }
     }
 
 
