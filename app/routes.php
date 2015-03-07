@@ -11,7 +11,7 @@
 |
 */
 
-Route::get('/', 'CrawlerController@getData');
+Route::get('/{batch}', 'HDBController@getData');
 Route::get('/residential', 'ResidentialController@getData');
 
 
