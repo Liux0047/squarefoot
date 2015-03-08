@@ -214,6 +214,10 @@ class HDBController extends BaseController
         $str = str_replace("Drive", "dr", $str);
         $str = str_replace("Avenue", "ave", $str);
         $str = str_replace("Street", "st", $str);
+        $str = str_replace("South", "sth", $str);
+        $str = str_replace("North", "nth", $str);
+        $str = str_replace("Jalan", "jln", $str);
+        $str = str_replace("Bukit", "bt", $str);
         $str = str_replace("'", "", $str);
         $str = str_replace(" ", "-", $str);
         return $str;
